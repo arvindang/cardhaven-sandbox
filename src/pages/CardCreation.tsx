@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Mic, Image, File, Repeat } from 'lucide-react';
-import { FlashcardProvider, useFlashcards, Deck } from '@/contexts/FlashcardContext';
+import { FlashcardProvider, useFlashcards } from '@/contexts/FlashcardContext';
 import Layout from '@/components/Layout';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -11,9 +11,6 @@ import { Label } from '@/components/ui/label';
 import { Separator } from '@/components/ui/separator';
 import { toast } from 'sonner';
 import { marked } from 'marked';
-
-// Add dependency for marked
-<lov-add-dependency>marked@latest</lov-add-dependency>
 
 const CardCreationContent = () => {
   const { deckId } = useParams<{ deckId: string }>();
@@ -36,8 +33,9 @@ const CardCreationContent = () => {
   useEffect(() => {
     if (isPreviewMode) {
       try {
-        setPreviewQuestion(marked.parse(question));
-        setPreviewAnswer(marked.parse(answer));
+        // Fix: Use synchronous version of marked and handle the return type correctly
+        setPreviewQuestion(marked.parse(question, { async: false }) as string);
+        setPreviewAnswer(marked.parse(answer, { async: false }) as string);
       } catch (error) {
         console.error('Markdown parsing error:', error);
         toast.error('Error previewing markdown');
